@@ -15,6 +15,7 @@
   "author": "Zeyu Yao <novodoodle@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.4.0",
     "discord.js": "^14.9.0"
   },
   "devDependencies": {
