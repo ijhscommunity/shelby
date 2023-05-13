@@ -74,9 +74,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const channel = client.channels.cache.get(config.introduction.channelId);
     if (channel) {
-      await channel.send(
-        `${name}, from ${location}, is ${age} years old and likes to ${like}! Welcome to YALA ${interaction.user}!`
-      );
+      await channel.send({
+        content: `${name}, from ${location}, is ${age} years old and likes to ${like}. Welcome to YALA ${interaction.user}!`,
+        files: ["assets/welcome.webp"],
+      });
     } else {
       console.error("Channel not found for introduction!");
     }
