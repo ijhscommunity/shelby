@@ -97,7 +97,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const squareSize = 10;
 
-    let img = new Jimp(470, 100, 0xffffffff);
+    let img = new Jimp(520, 100, 0xffffffff);
 
     for (let y = 0; y < img.bitmap.height; y += squareSize) {
       for (let x = 0; x < img.bitmap.width; x += squareSize) {
