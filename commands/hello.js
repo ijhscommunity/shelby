@@ -142,7 +142,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     let introductionEmbed = new EmbedBuilder()
       .setTitle(`${name} is ${age} years old from ${location} :wave:`)
-      .setDescription(`Welcome to YALA 2023! Now that you're introduced, meet the rest of the YALA community at <#${config.loungeID}>. Hope to see you there!`)
+      .setDescription(
+        `Welcome to YALA 2023! Now that you're introduced, meet the rest of the YALA community at <#${config.loungeID}>. Hope to see you there!`
+      )
       .setFooter({
         text: "P.S. You can download the custom image below by right clicking on it!",
       })
@@ -153,7 +155,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (channel) {
       const imageBuffer = await img.getBufferAsync(Jimp.MIME_PNG);
 
-      await channel.send({
+      const introductionMessage = await channel.send({
         embeds: [introductionEmbed],
       });
 
@@ -165,6 +167,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
           },
         ],
       });
+
+      // Start a new public thread based on the introductionMessage
+      const thread = await introductionMessage.startThread({
+        name: `${name}'s Introduction`,
+        autoArchiveDuration: 60, // thread auto-archives after 1 hour of inactivity
+        reason: "Opened for additional introduction or conversation",
+      });
+
+      // Send a follow-up message in the new thread
+      await thread.send(
+        "If you wanna put anything else, I've opened up a thread for ya!"
+      );
     } else {
       console.error("Channel not found for introduction!");
     }
