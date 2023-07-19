@@ -15,12 +15,14 @@
   "author": "Zeyu Yao <novodoodle@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "adjectives": "^1.0.2",
     "axios": "^1.4.0",
-    "discord.js": "^14.9.0",
-    "jimp": "^0.22.8"
+    "discord.js": "^14.11.0",
+    "jimp": "^0.22.8",
+    "nouns": "^1.0.1"
   },
   "devDependencies": {
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.3.1"
   },
   "repository": {
     "type": "git",
