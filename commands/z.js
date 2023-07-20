@@ -7,14 +7,34 @@ const { voiceCategoryID } = require("../config.json");
 const adj = require("adjectives");
 const { one } = require("nouns");
 
-// /z command
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("z")
-    .setDescription("Creates a temporary voice channel with a random name."),
+    .setDescription("Creates a temporary voice channel with a random name.")
+    .addStringOption((option) =>
+      option
+        .setName("access")
+        .setDescription(
+          "The ID of the role or user that should have access to the channel"
+        )
+        .setRequired(false)
+    )
+    .addIntegerOption((option) =>
+      option
+        .setName("inactivity")
+        .setDescription(
+          "Time of inactivity (in minutes) after which the channel should be deleted"
+        )
+        .setRequired(false)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("name")
+        .setDescription("Name of the voice channel")
+        .setRequired(false)
+    ),
 
   async execute(interaction) {
-    // Ensure the user has appropriate permissions to manage channels
     if (
       !interaction.member.permissions.has(
         PermissionsBitField.Flags.MANAGE_CHANNELS
@@ -25,47 +45,53 @@ module.exports = {
       );
     }
 
-    // Generate channel name
-    const channelName = `${
-      adj[Math.floor(Math.random() * adj.length)]
-    }-${one()}-${Math.floor(Math.random() * 1000)}`;
+    const accessID = interaction.options.getString("access");
+    const inactivityMinutes =
+      interaction.options.getInteger("inactivity") || 10;
+    const customName = interaction.options.getString("name");
 
-    // Create the channel in the voice channel category
+    const channelName =
+      customName ||
+      `${adj[Math.floor(Math.random() * adj.length)]}-${one()}-${Math.floor(
+        Math.random() * 1000
+      )}`;
+
+    const permissions = accessID
+      ? [
+          {
+            id: interaction.guild.id,
+            deny: [PermissionsBitField.Flags.ViewChannel],
+          },
+          {
+            id: accessID,
+            allow: [
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+            ],
+          },
+        ]
+      : [];
+
     const channel = await interaction.guild.channels.create({
       name: channelName,
       type: ChannelType.GuildVoice,
       parent: voiceCategoryID,
-      permissionOverwrites: [
-        {
-          id: interaction.guild.id,
-          deny: [PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: interaction.user.id,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.Connect,
-          ],
-        },
-      ],
+      permissionOverwrites: permissions,
     });
 
-    // Confirm channel creation
     await interaction.reply(
       `Created a temporary voice channel: ${channelName}`
     );
 
-    // Delete the channel after 10 minutes of inactivity
     const checkActivity = setInterval(async () => {
       if (channel.members.size === 0) {
         clearInterval(checkActivity);
         await channel.delete();
-        // Send an ephemeral message to the user
         interaction.followUp({
           content: `Deleted channel due to inactivity.`,
           ephemeral: true,
         });
       }
-    }, 10 * 60 * 1000);
+    }, inactivityMinutes * 60 * 1000);
   },
 };
