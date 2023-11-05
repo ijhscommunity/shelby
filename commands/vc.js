@@ -9,7 +9,7 @@ const { one } = require("nouns");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("z")
+    .setName("vc")
     .setDescription("Creates a temporary voice channel with a random name.")
     .addStringOption((option) =>
       option
